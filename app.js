@@ -26,7 +26,7 @@ const DB_HOST =
   "mongodb+srv://Illia:DyWBI5BAhlxSsT0A@cluster0.f5qanno.mongodb.net/my-contacts?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose
-  .connect()
+  .connect(DB_HOST)
   .then(() => {
     app.listen(3000, () => {
       console.log("Database connection successful");
