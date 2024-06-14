@@ -20,7 +20,7 @@ export const getAllContacts = async (req, res, next) => {
 export const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await contactsService.getContactById(id);
+    const result = await contactsService.getContactById({ _id: id });
 
     if (!result) {
       throw HttpError(404);
@@ -35,7 +35,7 @@ export const getOneContact = async (req, res, next) => {
 export const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await contactsService.removeContact(id);
+    const result = await contactsService.removeContact({ _id: id });
 
     if (!result) {
       return res.status(404).json({
@@ -72,7 +72,33 @@ export const updateContact = async (req, res, next) => {
     }
 
     const { id } = req.params;
-    const result = await contactsService.updateContactById(id, req.body);
+    const result = await contactsService.updateContactById(
+      { _id: id },
+      req.body
+    );
+
+    if (!result) {
+      throw HttpError(404);
+    }
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateStatusContact = async (req, res, next) => {
+  try {
+    const { error } = updateContactSchema.validate(req.body);
+    if (error) {
+      throw HttpError(400, error.message);
+    }
+
+    const { id } = req.params;
+    const result = await contactsService.updateContactFavoriteById(
+      { _id: id },
+      { favorite: req.body.favorite }
+    );
 
     if (!result) {
       throw HttpError(404);
