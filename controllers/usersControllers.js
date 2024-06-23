@@ -1,8 +1,11 @@
 import * as usersServices from "../services/usersServices.js";
 import bcrypt from "bcrypt";
-
+import gravatar from "gravatar";
+import Jimp from "jimp";
 import HttpError from "../helpers/HttpError.js";
 import { createToken } from "../helpers/jwt.js";
+import path from "path";
+import fs from "fs/promises";
 
 export const signup = async (req, res) => {
   const { email, password } = req.body;
@@ -17,6 +20,7 @@ export const signup = async (req, res) => {
   const newUser = await usersServices.signup({
     ...req.body,
     password: hashPassword,
+    avatarUrl: gravatar.url(email),
   });
 
   res.status(201).json({
@@ -65,5 +69,25 @@ export const signout = async (req, res) => {
 
   res.json({
     message: "logout success",
+  });
+};
+
+export const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: oldPath, filename } = req.file;
+  Jimp.read(filename).then((image) => {
+    image.resize(250, 250).catch((error) => {
+      console.log(error.message);
+    });
+  });
+
+  const newPath = path.join(avatarsDir, filename);
+  await fs.rename(oldPath, newPath);
+  const avatar = path.join("avatars", filename);
+
+  await usersServices.updateUser({ _id }, { avatarUrl: avatar });
+
+  res.json({
+    message: "avatar is update",
   });
 };

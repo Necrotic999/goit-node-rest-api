@@ -1,11 +1,13 @@
 import * as contactsService from "../services/contactsServices.js";
-
+import path from "path";
 import HttpError from "../helpers/HttpError.js";
 
 import {
   createContactSchema,
   updateContactSchema,
 } from "../schemas/contactsSchemas.js";
+
+const avatarsDir = path.resolve("public", "avatars");
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -72,7 +74,10 @@ export const createContact = async (req, res, next) => {
 
     const { _id: owner } = req.user;
 
-    const result = await contactsService.addContact({ ...req.body, owner });
+    const result = await contactsService.addContact({
+      ...req.body,
+      owner,
+    });
 
     res.status(201).json(result);
   } catch (error) {
