@@ -5,6 +5,7 @@ import {
   signin,
   getCurrent,
   signout,
+  verify,
 } from "../controllers/usersControllers.js";
 
 import validateBody from "../helpers/validateBody.js";
@@ -12,7 +13,11 @@ import authenticate from "../middlewares/authenticate.js";
 import validate from "../decorators/validate.js";
 import upload from "../middlewares/upload.js";
 
-import { authSigninSchema, authSignupSchema } from "../schemas/authSchemas.js";
+import {
+  authSigninSchema,
+  authSignupSchema,
+  authEmailSchema,
+} from "../schemas/authSchemas.js";
 
 const usersRouter = express.Router();
 
@@ -31,5 +36,14 @@ usersRouter.get("/current", authenticate, getCurrent);
 usersRouter.post("/logout", authenticate, signout);
 
 usersRouter.patch("/avatars", authenticate);
+
+usersRouter.get("/verify/:verificationToken", verify);
+
+usersRouter.post(
+  "/verify",
+  validateBody,
+  validate(authEmailSchema),
+  resendEmail
+);
 
 export default usersRouter;
